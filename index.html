@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الطفولة المبكرة المتقدم</title>
+    <style>
+        /* تعريف الألوان الأساسية */
+        :root {
+            --bg-deep: #0b0d17;
+            --card-bg: rgba(30, 31, 61, 0.7);
+            --primary-pink: #ff007f;
+            --primary-purple: #a020f0;
+            --neon-pink: #ff007f;
+            --neon-blue: #00d2ff;
+            --correct: #00ff88;
+            --wrong: #ff4b2b;
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(-45deg, #0b0d17, #1c1c3c, #2d0b3d, #0b0d17);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { width: 100%; max-width: 800px; }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            box-shadow: 0 0 20px rgba(160, 32, 240, 0.2);
+            animation: slideDown 1s ease-out;
+        }
+
+        h1 {
+            background: linear-gradient(to right, var(--primary-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 0.6s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .q-num-badge {
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #f1f1f1;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            padding: 16px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-item:hover {
+            background: rgba(138, 43, 226, 0.2);
+            border-color: var(--primary-pink);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+        }
+
+        input[type="radio"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        input[type="radio"]:checked {
+            background: var(--primary-pink);
+            box-shadow: 0 0 10px var(--primary-pink);
+        }
+
+        /* التصحيح */
+        .correct-ans { border: 2px solid var(--correct) !important; background: rgba(0, 255, 136, 0.15) !important; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .wrong-ans { border: 2px solid var(--wrong) !important; background: rgba(255, 75, 43, 0.15) !important; box-shadow: 0 0 20px rgba(255, 75, 43, 0.3); }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 15px;
+            border-right: 5px solid var(--neon-blue);
+            display: none;
+            font-size: 0.95em;
+            animation: fadeIn 0.5s;
+        }
+
+        .submit-container {
+            position: sticky;
+            bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+
+        .btn-grad {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #8e2de2, #f00075, #8e2de2);
+            background-size: 200% auto;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3em;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(240, 0, 117, 0.5);
+            transition: 0.5s;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 10px 30px rgba(240, 0, 117, 0.5); }
+            50% { transform: scale(1.03); box-shadow: 0 10px 50px rgba(240, 0, 117, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 10px 30px rgba(240, 0, 117, 0.5); }
+        }
+
+        /* Modal النتيجة */
+        #modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: #1e1e2e;
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            border: 2px solid var(--primary-pink);
+            max-width: 500px;
+            width: 90%;
+            animation: zoomIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .score-display {
+            font-size: 4em;
+            font-weight: 900;
+            color: var(--primary-pink);
+            margin: 20px 0;
+            text-shadow: 0 0 20px var(--primary-pink);
+        }
+
+        .motivation-msg {
+            font-size: 1.4em;
+            color: var(--neon-blue);
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6em; }
+            .modal-box { padding: 30px; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>تحدي الطفولة المبكرة 🚀</h1>
+        <p>اختبر معلوماتك في الفصل الثالث بأجواء حماسية</p>
+    </header>
+
+    <div id="quiz-wall">
+        <!-- الأسئلة سيتم توليدها هنا -->
+    </div>
+
+    <div class="submit-container">
+        <button class="btn-grad" onclick="calculateResult()">تمت الإجابة.. أظهر النتيجة ✨</button>
+    </div>
+</div>
+
+<!-- Modal النتيجة -->
+<div id="modal">
+    <div class="modal-box">
+        <h2>نتيجتك النهائية</h2>
+        <div class="score-display" id="final-score">0</div>
+        <div class="motivation-msg" id="motivation-msg"></div>
+        <p id="stats"></p>
+        <button class="btn-grad" style="padding: 10px; font-size: 1em;" onclick="closeModal()">مراجعة الأخطاء والشرح 🔍</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // --- 30 سؤال اختيار من متعدد ---
+        { q: "يصل وزن مخ الطفل في نهاية مرحلة الطفولة المبكرة إلى حوالي كم من وزن مخ الراشد؟", options: ["50%", "75%", "90%", "100%"], correct: 2, exp: "ينمو المخ بسرعة كبيرة في هذه المرحلة حتى يصل إلى 90% من حجمه النهائي عند سن السادسة." },
+        { q: "يستطيع طفل سن الثالثة أن يبني برجاً من المكعبات يتكون من:", options: ["3 مكعبات", "6 مكعبات", "9 مكعبات", "12 مكعباً"], correct: 2, exp: "النمو الحركي في سن الثالثة يسمح للطفل ببناء برج من 9 مكعبات، بينما سن الثانية يبني 6 فقط." },
+        { q: "تتميز مرحلة الطفولة المبكرة من الناحية الجسمية بأنها فترة:", options: ["أسرع مراحل النمو", "تباطؤ نسبي مقارنة بالمهد", "توقف تام للنمو", "نمو فجائي ومضطرب"], correct: 1, exp: "رغم استمرار النمو، إلا أن سرعته تقل وتتباطأ مقارنة بالسرعة الهائلة في مرحلة المهد (العامين الأولين)." },
+        { q: "أي من الحواس التالية تعتبر الأكثر نضجاً واستجابة في هذه المرحلة؟", options: ["البصر", "السمع", "التذوق", "الشم"], correct: 2, exp: "تعتبر حاسة التذوق مكتملة جداً، حيث يستطيع الطفل التمييز بدقة بين الطعم الحلو والمالح والمر." },
+        { q: "يسمى الخيال في هذه المرحلة بالخيال 'الإيهامي'، وهو يعني:", options: ["خيال واقعي جداً", "تحويل الأشياء من وظيفتها الأصلية لما يتخيله الطفل", "عدم وجود خيال", "خيال علمي معقد"], correct: 1, exp: "الخيال الإيهامي يجعل الطفل يستخدم (عصا) كأنها (حصان)، وهو ذروة النشاط التخيلي في هذه السن." },
+        { q: "في النمو اللغوي، يطلق على هذه المرحلة اسم:", options: ["مرحلة الصمت", "مرحلة الكلمة الواحدة", "العصر الذهبي للغة", "مرحلة الجملة المعقدة"], correct: 2, exp: "تسمى بالعصر الذهبي لسرعة اكتساب المفردات واتقان القواعد اللغوية الأساسية." },
+        { q: "من مظاهر 'التمركز حول الذات' معرفياً أن الطفل:", options: ["يحب مشاركة ألعابه مع الجميع", "لا يدرك أن للآخرين وجهة نظر تختلف عنه", "يهتم بمشاعر الغرباء", "يفكر بشكل منطقي مجرد"], correct: 1, exp: "التمركز حول الذات يعني أن الطفل يعتقد أن الجميع يرى ويسمع ويشعر تماماً كما يفعل هو." },
+        { q: "يستطيع طفل الرابعة استخدام المقص لقص الصور، وهذا يعكس تطور:", options: ["العضلات الكبيرة", "العضلات الدقيقة", "العظام الطويلة", "الجهاز الهضمي"], correct: 1, exp: "استخدام المقص يتطلب تآزراً دقيقاً بين العين وعضلات الأصابع الصغيرة (الدقيقة)." },
+        { q: "تبدأ 'الغيرة' في هذه المرحلة تظهر بوضوح نتيجة لـ:", options: ["دخول المدرسة", "قدوم مولود جديد", "تغيير السكن", "مشاهدة التلفاز"], correct: 1, exp: "المولود الجديد يسحب الاهتمام والدلال، مما يثير مشاعر الغيرة لدى طفل الطفولة المبكرة." },
+        { q: "يتراوح طول الطفل في سن الثالثة في المتوسط حوالي:", options: ["70 سم", "90 سم", "110 سم", "120 سم"], correct: 1, exp: "في سن الثالثة يصل الطول المتوسط لنحو 90 سم، ويزداد ليصل لـ 110 سم تقريباً في سن السادسة." },
+        { q: "تعتبر 'نوبات الغضب' في هذه المرحلة وسيلة الطفل لـ:", options: ["التعبير عن الجوع", "إثبات الاستقلال والذات", "تحسين اللياقة", "لفت انتباه الجيران"], correct: 1, exp: "عندما تُقيد حركة الطفل أو يُمنع من فعل شيء، يلجأ لنوبات الغضب لإثبات شخصيته المستقلة." },
+        { q: "تظهر لدى الطفل ظاهرة 'الإحيائية' (Animism)، وتعني:", options: ["القدرة على القراءة", "إضفاء صفة الحياة على الجمادات", "الخوف من الحيوانات", "حب الرسم"], correct: 1, exp: "الطفل يعامل عروسه أو لعبته كأنها كائن حي يتألم ويجوع ويأكل." },
+        { q: "تنمو حصيلة الطفل اللغوية في نهاية هذه المرحلة لتصل تقريباً إلى:", options: ["500 كلمة", "1000 كلمة", "2500 كلمة", "10000 كلمة"], correct: 2, exp: "تزداد المفردات من حوالي 3 كلمات في سن سنة إلى حوالي 2500 كلمة في سن السادسة." },
+        { q: "في اللعب الاجتماعي، يبدأ الطفل في سن الثالثة بما يسمى 'اللعب المتوازي'، وهو:", options: ["لعب منظم بقواعد", "لعب بجوار طفل آخر دون تفاعل حقيقي", "لعب كرة القدم", "رفض اللعب تماماً"], correct: 1, exp: "يلعب الطفل بجانب الآخرين وبنفس الألعاب، لكن كل واحد يعيش في عالمه الخاص دون تعاون." },
+        { q: "تؤدي زيادة إفراز الغدة الدرقية (الثيروكسين) في هذه السن إلى:", options: ["الخمول والبلادة", "النشاط الزائد والتوتر", "زيادة الوزن", "النوم الطويل"], correct: 1, exp: "الزيادة تسبب 'فرط نشاط' وتوتر، بينما النقص يسبب خمولاً وضعفاً عقلياً." },
+        { q: "يستطيع طفل الخامسة أن يقفز على قدم واحدة، وهذا مظهر من مظاهر النضج:", options: ["العقلي", "الحركي (التوازن)", "الاجتماعي", "الفسيولوجي"], correct: 1, exp: "التحكم في التوازن الحركي يتطور بشكل كبير في سن الخامسة." },
+        { q: "الطفل في هذه المرحلة يفضل الألوان الزاهية، وأكثر لونين جذباً له هما:", options: ["الأبيض والأسود", "الأحمر والأزرق", "الأخضر والأصفر", "البني والرمادي"], correct: 1, exp: "تشير الدراسات إلى ميل الأطفال القوي نحو اللونين الأحمر والأزرق في هذه المرحلة." },
+        { q: "تعتمد الذاكرة في مرحلة الطفولة المبكرة بشكل أساسي على:", options: ["الفهم المنطقي", "التكرار والحفظ الآلي", "الاستنتاج", "الربط الفلسفي"], correct: 1, exp: "ذاكرة الطفل في هذه السن هي 'ذاكرة آلية' تحفظ الأسماء والأرقام بالتكرار دون فهم عميق للمضمون." },
+        { q: "من الناحية الفسيولوجية، تتميز ضربات قلب الطفل في هذه المرحلة بأنها:", options: ["سريعة جداً وغير مستقرة", "أصبحت أكثر بطئاً واستقراراً", "متوقفة", "مساوية للراشد تماماً"], correct: 1, exp: "مع النضج، تصبح ضربات قلب الطفل أكثر انتظاماً وأقل سرعة مما كانت عليه في المهد." },
+        { q: "الذكاء في هذه المرحلة يسمى الذكاء:", options: ["الحسي الحركي", "التصوري (قبل العمليات)", "المجرد المنطقي", "الاجتماعي المعقد"], correct: 1, exp: "يعتمد على الصور الذهنية والرموز (قبل القدرة على العمليات المنطقية الحقيقية)." },
+        { q: "يستطيع طفل الخامسة بناء برج من المكعبات يتكون من عدد كم مكعب؟", options: ["5 مكعبات", "10 مكعبات", "أكثر من 10 مكعبات", "لا يستطيع البناء"], correct: 2, exp: "نضج التآزر الحركي البصري يسمح له ببناء هياكل معقدة تفوق الـ 10 مكعبات." },
+        { q: "أكثر أنواع الأسئلة التي يطرحها الطفل في هذه المرحلة هي:", options: ["كيف ومتى؟", "لماذا وما هذا؟", "أين ومن؟", "لا يطرح أسئلة"], correct: 1, exp: "كثرة سؤال (لماذا) و(ما هذا) تعكس فضوله العقلي لاستكشاف العالم المحيط." },
+        { q: "تميل البنات في هذه المرحلة في لعبهن إلى:", options: ["النشاط العضلي العنيف", "المحاكاة واللعب الهادئ", "الجري لمسافات طويلة", "المصارعة"], correct: 1, exp: "تميل البنات لتقليد الأم والعرائس واللعب المنزلي الهادئ." },
+        { q: "معيار اتقان اللغة لدى الطفل في هذه المرحلة هو:", options: ["نطق الكلمات فقط", "وضوح النطق للأغرب وربط الكلمة بمعناها", "طول الجملة فقط", "الصراخ"], correct: 1, exp: "اللغة الحقيقية هي التي يفهمها الآخرون (غير الوالدين) وتؤدي وظيفة تواصلية." },
+        { q: "يبدأ نمو 'الضمير' في نهاية هذه المرحلة عبر:", options: ["القراءة", "التوحد مع الوالدين واتباع أوامرهما", "المدرسة", "الفطرة دون تدخل"], correct: 1, exp: "يتعلم الطفل الصواب والخطأ من خلال تقليد الوالدين واستدماج قيمهم." },
+        { q: "في التفكير العقلي، يواجه الطفل صعوبة في فهم مفهوم 'بقاء المادة'، مثال:", options: ["يعرف أن الورقة هي ورقة", "يعتقد أن كمية الماء تتغير إذا سكبناها في إناء أطول", "يعرف أسماء إخوته", "يتذكر مكان ألعابه"], correct: 1, exp: "يخدعه المظهر الخارجي؛ فإذا تغير شكل الوعاء يعتقد أن الكمية تغيرت." },
+        { q: "الخوف عند طفل هذه المرحلة يكون غالباً من:", options: ["المستقبل المهني", "الظلام والحيوانات والمجهول", "الفشل الدراسي", "المشاكل السياسية"], correct: 1, exp: "مخاوفه حسية مرتبطة بخياله الواسع تجاه الظلام والحيوانات." },
+        { q: "تعتبر الأسرة هي المؤسسة الاجتماعية:", options: ["الثانوية", "الأولى والأساسية", "غير المهمة", "التي تلي المدرسة"], correct: 1, exp: "الأسرة هي المصنع الأول الذي يشكل شخصية الطفل قبل أي احتكاك خارجي." },
+        { q: "يصل وزن الطفل في نهاية هذه المرحلة (6 سنوات) إلى حوالي:", options: ["10 كجم", "19 كجم", "30 كجم", "5 كجم"], correct: 1, exp: "الوزن المتوسط في سن السادسة يكون حوالي 19 كيلوجراماً." },
+        { q: "تكتمل الأسنان اللبنية وتنتظم في مرحلة:", options: ["المهد", "الطفولة المبكرة", "الطفولة المتأخرة", "المراهقة"], correct: 1, exp: "في هذه المرحلة تكتمل الأسنان اللبنية مما يساعد الطفل على تناول طعام الراشدين." },
+
+        // --- 20 سؤال صح وغلط ---
+        { q: "تنمو العضلات الكبيرة قبل العضلات الدقيقة في مرحلة الطفولة المبكرة.", options: ["صح", "خطأ"], correct: 0, exp: "هذا قانون نمو؛ يتحكم الطفل في ذراعيه وقدميه قبل تحكمه في أصابعه اليد." },
+        { q: "تعتبر سرعة النمو الجسمي في هذه المرحلة أسرع منها في مرحلة المهد.", options: ["صح", "خطأ"], correct: 1, exp: "النمو يتباطأ نسبياً في هذه المرحلة مقارنة بمرحلة المهد (أول سنتين)." },
+        { q: "يستطيع طفل الثالثة التمييز بدقة بين اتجاهات اليمين واليسار.", options: ["صح", "خطأ"], correct: 1, exp: "يصعب على الطفل في البداية التمييز بين الاتجاهات المكانية، وينضج ذلك تدريجياً بعد سن السادسة." },
+        { q: "خيال الطفل في هذه المرحلة خيال 'بصري حركي' بالدرجة الأولى.", options: ["صح", "خطأ"], correct: 0, exp: "الطفل يجسد خياله في صور وأفعال وحركات واقعية." },
+        { q: "في سن الثالثة، يستخدم الطفل ضمير المتكلم 'أنا' للتعبير عن نفسه.", options: ["صح", "خطأ"], correct: 0, exp: "هذا دليل على نمو الوعي بالذات وبدء الانفصال عن الآخرين لغوياً." },
+        { q: "يؤدي الحرمان العاطفي من الوالدين إلى تأخر في كافة جوانب النمو.", options: ["صح", "خطأ"], correct: 0, exp: "العلاقة العاطفية السوية هي الوقود الأساسي للنمو النفسي والجسمي السليم." },
+        { q: "يستطيع طفل هذه المرحلة إدراك المفاهيم المجردة كالصدق والأمانة بشكل فلسفي.", options: ["صح", "خطأ"], correct: 1, exp: "تفكيره يظل مرتبطاً بالمحسوسات والواقع الملموس فقط." },
+        { q: "يقل عدد ساعات النوم في هذه المرحلة لتصل إلى حوالي 11-12 ساعة يومياً.", options: ["صح", "خطأ"], correct: 0, exp: "مع النضج وزيادة النشاط، تقل ساعات النوم عما كانت عليه في المهد." },
+        { q: "التمركز حول الذات في التفكير يعني أن الطفل أناني بطبعه.", options: ["صح", "خطأ"], correct: 1, exp: "ليست أنانية، بل هي قيود معرفية تجعله لا يرى إلا من منظوره هو فقط." },
+        { q: "تعتبر مرحلة الطفولة المبكرة هي مرحلة وضع بذور الشخصية.", options: ["صح", "خطأ"], correct: 0, exp: "فيها تتشكل الاتجاهات والميول والسمات الأساسية التي تستمر مع الفرد." },
+        { q: "نقص إفراز اليود في هذه السن يؤدي إلى القزامة وضعف القوى العقلية.", options: ["صح", "خطأ"], correct: 0, exp: "اليود عنصر أساسي لهرمون الثيروكسين المسؤول عن النمو العقلي والجسمي." },
+        { q: "يستطيع طفل السادسة أن يكتب جملة كاملة بخط منمق ومستوٍ.", options: ["صح", "خطأ"], correct: 1, exp: "تظل الكتابة في بداياتها وبخط كبير وغير منتظم لعدم اكتمال نضج العضلات الدقيقة تماماً." },
+        { q: "يعد اللعب الفردي هو السمة الغالبة في سن الخامسة.", options: ["صح", "خطأ"], correct: 1, exp: "في سن الخامسة يتحول اللعب إلى لعب جماعي تعاوني منظم." },
+        { q: "تتأثر سرعة تعلم اللغة بذكاء الطفل والبيئة الثقافية المحيطة به.", options: ["صح", "خطأ"], correct: 0, exp: "الذكاء يوفر القدرة، والبيئة توفر المثيرات والتدريب." },
+        { q: "الطفل في سن الثالثة لا يهتم إطلاقاً بوجود أطفال آخرين بجانبه.", options: ["صح", "خطأ"], correct: 1, exp: "يهتم بوجودهم (لعب متوازي) لكنه لا يتفاعل معهم في نشاط مشترك." },
+        { q: "النمو الحركي في هذه المرحلة يتبع اتجاهاً من الرأس إلى القدمين.", options: ["صح", "خطأ"], correct: 0, exp: "هذا قانون ثابت؛ السيطرة الحركية تبدأ بالرأس والعينين ثم الجذع ثم القدمين." },
+        { q: "ظاهرة 'الإحيائية' تختفي تماماً عند سن الثالثة.", options: ["صح", "خطأ"], correct: 1, exp: "بل تكون في قمتها وتستمر لفترة أطول خلال هذه المرحلة." },
+        { q: "يساعد الذهاب للحضانة في تسريع عملية النمو الاجتماعي للطفل.", options: ["صح", "خطأ"], correct: 0, exp: "الحضانة توفر فرصاً للتفاعل والتعاون وتوسيع دائرة العلاقات خارج الأسرة." },
+        { q: "تتميز انفعالات الطفل في هذه المرحلة بالثبات والهدوء الطويل.", options: ["صح", "خطأ"], correct: 1, exp: "انفعالاته حادة، سريعة التقلب، وقصيرة المدى." },
+        { q: "يعد الاستكشاف وحب الاستطلاع دافعاً قوياً للتعلم في هذه المرحلة.", options: ["صح", "خطأ"], correct: 0, exp: "رغبة الطفل في معرفة 'ما هذا' و'لماذا' هي محرك نموه العقلي." }
+    ];
+
+    function buildQuiz() {
+        const wall = document.getElementById('quiz-wall');
+        questions.forEach((item, idx) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.style.animationDelay = `${idx * 0.1}s`;
+            
+            card.innerHTML = `
+                <div class="q-num-badge">سؤال ${idx + 1}</div>
+                <div class="question-text">${item.q}</div>
+                <div class="options-grid">
+                    ${item.options.map((opt, i) => `
+                        <label class="option-item" id="L-${idx}-${i}">
+                            <input type="radio" name="Q${idx}" value="${i}">
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="EXP-${idx}">
+                    <strong>💡 الشرح:</strong> ${item.exp}
+                </div>
+            `;
+            wall.appendChild(card);
+        });
+    }
+
+    function calculateResult() {
+        let score = 0;
+        questions.forEach((item, idx) => {
+            const selected = document.querySelector(`input[name="Q${idx}"]:checked`);
+            const expBox = document.getElementById(`EXP-${idx}`);
+            expBox.style.display = 'block';
+
+            if (selected) {
+                const val = parseInt(selected.value);
+                if (val === item.correct) {
+                    score++;
+                    document.getElementById(`L-${idx}-${val}`).classList.add('correct-ans');
+                } else {
+                    document.getElementById(`L-${idx}-${val}`).classList.add('wrong-ans');
+                    document.getElementById(`L-${idx}-${item.correct}`).classList.add('correct-ans');
+                }
+            } else {
+                document.getElementById(`L-${idx}-${item.correct}`).classList.add('correct-ans');
+            }
+        });
+
+        showModal(score);
+    }
+
+    function showModal(score) {
+        const modal = document.getElementById('modal');
+        const scoreDiv = document.getElementById('final-score');
+        const msgDiv = document.getElementById('motivation-msg');
+        
+        scoreDiv.innerText = `${score}/50`;
+        
+        // جمل تحفيزية بناءً على الدرجة
+        if (score === 50) {
+            msgDiv.innerHTML = "أنت أسطورة! 👑 نتيجتك مثالية، لقد هزمت الفصل الثالث تماماً!";
+        } else if (score >= 45) {
+            msgDiv.innerHTML = "مذهل جداً! 🔥 مستواك احترافي، أنت مشروع عالم نفس ناجح.";
+        } else if (score >= 35) {
+            msgDiv.innerHTML = "أداء رائع! 👍 معلوماتك قوية جداً، مراجعة بسيطة للأخطاء وستصل للقمة.";
+        } else if (score >= 25) {
+            msgDiv.innerHTML = "جيد! 📚 لديك أساس جيد، اقرأ الشروحات تحت كل سؤال لتقوية نقاط ضعفك.";
+        } else {
+            msgDiv.innerHTML = "لا بأس، البدايات دائماً صعبة! 💪 اقرأ الشروحات جيداً وحاول مرة أخرى، ستنجح بالتأكيد.";
+        }
+
+        modal.style.display = 'flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    window.onload = buildQuiz;
+</script>
+
+</body>
+</html>
